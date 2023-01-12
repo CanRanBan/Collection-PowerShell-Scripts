@@ -35,7 +35,7 @@ Function Set-Window {
                 1.0//Boe Prox  - 11/24/2015 - Initial build
                 1.1//JosefZ    - 19.05.2018 - Treats more process instances of supplied process name properly
                 1.2//JosefZ    - 21.02.2019 - Parameter Id
-                1.3//CanRanBan - 2023-01-12 - Formatting changes, removal of unused DLL import, addition of sources
+                1.3//CanRanBan - 2023-01-12 - Formatting changes, removal of unused DLL import, addition of sources, additional documentation, meaningful warnings
 
         .LINK
             Current Source:
@@ -46,9 +46,8 @@ Function Set-Window {
             https://superuser.com/questions/1324007/setting-window-size-and-position-in-powershell-5-and-6
 
         .OUTPUTS
-            None
-            System.Management.Automation.PSCustomObject
-            System.Object
+            None                                            Default is no output.
+            System.Management.Automation.PSCustomObject     Returns the window properties if -Passthrough is used.
 
         .EXAMPLE
             Get-Process powershell | Set-Window -X 20 -Y 40 -Passthrough -Verbose
@@ -86,16 +85,16 @@ Function Set-Window {
             Description: Display the coordinates of the window for the current PowerShell session in a table view.
 
     #>
-    [cmdletbinding(DefaultParameterSetName='Name')]
+    [CmdletBinding(DefaultParameterSetName='Name')]
     Param (
-        [parameter(
-            Mandatory=$False,
-            ValueFromPipelineByPropertyName=$True,
+        [Parameter(
+            Mandatory=$false,
+            ValueFromPipelineByPropertyName=$true,
             ParameterSetName='Name')]
         [string]$ProcessName='*',
-        [parameter(
-            Mandatory=$True,
-            ValueFromPipeline=$False,
+        [Parameter(
+            Mandatory=$true,
+            ValueFromPipeline=$false,
             ParameterSetName='Id')]
         [int]$Id,
         [int]$X,
@@ -150,7 +149,7 @@ Function Set-Window {
         }
         if ( $null -eq $Processes ) {
             if ( $PSBoundParameters['Passthrough'] ) {
-                Write-Warning 'No process match criteria specified'
+                Write-Warning 'No process found for used parameters.'
             }
         } else {
             $Processes | ForEach-Object {
@@ -173,7 +172,7 @@ Function Set-Window {
                     $Height = $Rectangle.Bottom - $Rectangle.Top
                 }
                 if ( $Return ) {
-                    $Return = [Window]::MoveWindow($Handle, $x, $y, $Width, $Height, $True)
+                    $Return = [Window]::MoveWindow($Handle, $X, $Y, $Width, $Height, $true)
                 }
                 if ( $PSBoundParameters['Passthrough'] ) {
                     $Rectangle = New-Object RECT
